@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "staff",
+  "info": {
+    "singularName": "staffs",
+    "pluralName": "staff",
+    "displayName": "staff",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "position": {
+      "type": "string",
+      "required": true
+    },
+    "date_of_joining": {
+      "type": "date",
+      "required": true
+    },
+    "salary": {
+      "type": "decimal"
+    },
+    "work_ots": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::work-ot.work-ot",
+      "mappedBy": "staff"
+    },
+    "permission_1s": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::permission1.permission1",
+      "mappedBy": "staff"
+    },
+    "contact_method": {
+      "type": "enumeration",
+      "enum": [
+        "phone",
+        "telegram"
+      ]
+    }
+  }
+}

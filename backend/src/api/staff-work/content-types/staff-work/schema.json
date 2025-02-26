@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "staff_works",
+  "info": {
+    "singularName": "staff-work",
+    "pluralName": "staff-works",
+    "displayName": "staff-work",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "staff": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::staffs.staffs"
+    },
+    "total_work_ots_hours": {
+      "type": "decimal"
+    },
+    "total_permission_days": {
+      "type": "decimal"
+    },
+    "start_date": {
+      "type": "date"
+    },
+    "end_date": {
+      "type": "date"
+    }
+  }
+}

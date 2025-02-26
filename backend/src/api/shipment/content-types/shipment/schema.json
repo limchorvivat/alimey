@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "shipments",
+  "info": {
+    "singularName": "shipment",
+    "pluralName": "shipments",
+    "displayName": "Shipment"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "trackingNumber": {
+      "type": "string",
+      "required": true
+    },
+    "shippingMethod": {
+      "type": "string",
+      "required": true
+    },
+    "departureDate": {
+      "type": "date"
+    },
+    "arrivalDate": {
+      "type": "date",
+      "required": true
+    },
+    "customsStatus": {
+      "type": "string",
+      "required": true
+    },
+    "insuranceAmount": {
+      "type": "decimal"
+    },
+    "specialHandling": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

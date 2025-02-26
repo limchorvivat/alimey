@@ -1,0 +1,60 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user2s",
+  "info": {
+    "singularName": "user2",
+    "pluralName": "user2s",
+    "displayName": "user2",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "create_at": {
+      "type": "datetime"
+    },
+    "sex": {
+      "type": "enumeration",
+      "enum": [
+        "Another",
+        "Male",
+        "Female"
+      ],
+      "required": true,
+      "default": "Another"
+    },
+    "services": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::service.service",
+      "inversedBy": "customernames"
+    },
+    "phone": {
+      "type": "integer",
+      "required": true
+    },
+    "contact_method": {
+      "type": "enumeration",
+      "enum": [
+        "phone",
+        "telegram"
+      ]
+    },
+    "task_managements": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::task-management.task-management",
+      "mappedBy": "customer"
+    }
+  }
+}

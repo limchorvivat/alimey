@@ -1,0 +1,66 @@
+{
+  "kind": "collectionType",
+  "collectionName": "task_managements",
+  "info": {
+    "singularName": "task-management",
+    "pluralName": "task-managements",
+    "displayName": "task_management",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "issueDate": {
+      "type": "date"
+    },
+    "priority": {
+      "type": "enumeration",
+      "enum": [
+        "Low",
+        "Medium",
+        "High"
+      ]
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "To Do",
+        "In Progress",
+        "Completed",
+        "Cancelled"
+      ]
+    },
+    "tobeCompletedDate": {
+      "type": "date"
+    },
+    "actualCompleteDate": {
+      "type": "date"
+    },
+    "issueDescription": {
+      "type": "text"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "customer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::user2.user2",
+      "inversedBy": "task_managements"
+    },
+    "resolver": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "task_managemens"
+    },
+    "comments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::comment.comment",
+      "mappedBy": "task"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cargos",
+  "info": {
+    "singularName": "cargo",
+    "pluralName": "cargos",
+    "displayName": "cargo",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "weight": {
+      "type": "decimal"
+    },
+    "volume": {
+      "type": "decimal"
+    },
+    "departuredate": {
+      "type": "datetime"
+    },
+    "arrivaldate": {
+      "type": "datetime"
+    },
+    "deliveryfee": {
+      "type": "decimal"
+    }
+  }
+}

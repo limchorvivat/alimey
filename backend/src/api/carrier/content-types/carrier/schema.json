@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "carriers",
+  "info": {
+    "singularName": "carrier",
+    "pluralName": "carriers",
+    "displayName": "carrier",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "serviceTypes": {
+      "type": "enumeration",
+      "enum": [
+        "Air",
+        "Sea",
+        "Land",
+        "Express"
+      ]
+    },
+    "rates": {
+      "type": "decimal",
+      "required": true
+    },
+    "contact": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

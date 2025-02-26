@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "work_ots",
+  "info": {
+    "singularName": "work-ot",
+    "pluralName": "work-ots",
+    "displayName": "Work_OT",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "date": {
+      "type": "date"
+    },
+    "hour": {
+      "type": "integer"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "staff": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::staffs.staffs",
+      "inversedBy": "work_ots"
+    }
+  }
+}
