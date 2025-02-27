@@ -111,6 +111,10 @@ const resources = {
       "Actual Completion Date": "Actual Completion Date",
       "Target Completion Date": "Target Completion Date",
       "Issue Date": "Issue Date",
+      "Task Management": "Task Management",
+      "Enter the description": "Enter the description",
+      "Enter the notes": "Enter the notes",
+      
     },
   },
   kh: {

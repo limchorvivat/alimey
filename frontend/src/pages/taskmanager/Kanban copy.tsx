@@ -12,19 +12,20 @@
 // import { TaskModal } from "./TaskModal";
 // import { Task, User, User2 } from "./types";
 // import dayjs from "dayjs";
+// import { useTranslation } from "react-i18next";
 
 // const Kanban: React.FC = () => {
+//   const { t } = useTranslation();
 //   const { data: user } = useGetIdentity<User>();
 //   const [isTaskModalVisible, setTaskModalVisible] = useState(false);
 //   const [editingTask, setEditingTask] = useState<Task | null>(null);
 //   const [taskForm] = Form.useForm();
 
-//   // Data fetching from task-managements
-//   const { data: tasksData, error: tasksError } = useList<Task>({
+//   const { data: tasksData, error: tasksError, refetch } = useList<Task>({
 //     resource: "task-managements",
 //     meta: { 
 //       pagination: { current: 1, pageSize: 25 }, 
-//       populate: ["customer", "resolver", "comments"] 
+//       populate: ["customer", "resolver", "comments.author", "comments.task"] // Populate author and task for comments
 //     },
 //   });
 //   const { data: usersData, error: usersError } = useList<User>({ resource: "users" });
@@ -33,10 +34,14 @@
 //   const { mutate: updateTask } = useUpdate<Task, HttpError>();
 //   const { mutate: deleteTask } = useDelete<Task, HttpError>();
 //   const { mutate: createTask } = useCreate<Task, HttpError>();
+//   const { mutate: createComment } = useCreate(); // For creating comments
 
-//   // Log errors and data for debugging
+//   const tasks = tasksData?.data || [];
+//   const users = usersData?.data || [];
+//   const customers = user2sData?.data || [];
+
 //   useEffect(() => {
-//     console.log("Tasks Data:", tasksData);
+//     console.log("Raw tasksData from API:", tasksData);
 //     console.log("Users Data:", usersData);
 //     console.log("User2s Data:", user2sData);
 //     if (tasksError) console.error("Tasks Fetch Error:", tasksError);
@@ -44,44 +49,47 @@
 //     if (user2sError) console.error("User2s Fetch Error:", user2sError);
 //   }, [tasksError, usersError, user2sError, tasksData, usersData, user2sData]);
 
-//   const tasks = tasksData?.data || [];
-//   const users = usersData?.data || [];
-//   const user2s = user2sData?.data || [];
+//   console.log("Processed tasks array:", tasks);
 
-//   // Overdue notification (checking tobeCompletedDate and status)
+//   // Check for tasks nearing target date (within 2 days) and in "In Progress"
 //   useEffect(() => {
-//     console.log("Tasks for overdue check:", tasks);
 //     tasks.forEach((task) => {
-//       if (task.tobeCompletedDate && task.status !== "Completed") {
-//         if (dayjs(task.tobeCompletedDate).isBefore(dayjs())) {
-//           notification.warning({
-//             message: "Overdue Task",
-//             description: `${task.issueDescription} is overdue!`,
-//             duration: 0,
-//           });
-//         }
+//       if (
+//         task.tobeCompletedDate &&
+//         task.status === t("In Progress") && // Use translated status
+//         dayjs(task.tobeCompletedDate).diff(dayjs(), "day") <= 2 &&
+//         dayjs(task.tobeCompletedDate).isAfter(dayjs()) // Not yet overdue
+//       ) {
+//         notification.warning({
+//           message: t("Task Approaching Deadline"),
+//           description: t("Task nearing target date", { description: task.issueDescription }),
+//           duration: 0,
+//         });
 //       }
 //     });
-//   }, [tasks]);
+//   }, [tasks, t]);
 
 //   const handleTaskUpdate = (taskId: number, status: string) => {
+//     console.log("Updating task with ID:", taskId, "to status:", status);
 //     updateTask({ 
 //       resource: "task-managements", 
 //       id: taskId, 
 //       values: { status } 
 //     }, {
 //       onSuccess: () => {
-//         console.log("Task updated successfully");
+//         console.log("Task updated successfully with ID:", taskId);
 //         notification.success({
-//           message: "Task Updated",
-//           description: "The task status has been updated successfully.",
+//           message: t("Task Updated"),
+//           description: t("Task status updated successfully"),
+//           type: "success",
 //         });
 //       },
 //       onError: (error: HttpError) => {
-//         console.error("Error updating task:", error);
+//         console.error("Error updating task with ID:", taskId, error);
 //         notification.error({
-//           message: "Update Failed",
-//           description: `Failed to update task: ${error.message || "Unknown error"}`,
+//           message: t("Update Failed"),
+//           description: t("Failed to update task", { message: error.message || t("Unknown") }),
+//           type: "error",
 //           duration: 0,
 //         });
 //       },
@@ -90,23 +98,26 @@
 
 //   const handleTaskDelete = (task: Task) => {
 //     Modal.confirm({
-//       title: "Are you sure you want to delete this task?",
+//       title: t("Are you sure you want to delete this task?"),
 //       onOk: () => {
+//         console.log("Deleting task with ID:", task.id);
 //         deleteTask({ 
 //           resource: "task-managements", 
 //           id: task.id 
 //         }, {
 //           onSuccess: () => {
 //             notification.success({
-//               message: "Task Deleted",
-//               description: "The task has been deleted successfully.",
+//               message: t("Task Deleted"),
+//               description: t("Task deleted successfully"),
+//               type: "success",
 //             });
 //           },
 //           onError: (error: HttpError) => {
-//             console.error("Error deleting task:", error);
+//             console.error("Error deleting task with ID:", task.id, error);
 //             notification.error({
-//               message: "Deletion Failed",
-//               description: `Failed to delete task: ${error.message || "Unknown error"}`,
+//               message: t("Deletion Failed"),
+//               description: t("Failed to delete task", { message: error.message || t("Unknown") }),
+//               type: "error",
 //               duration: 0,
 //             });
 //           },
@@ -116,6 +127,7 @@
 //   };
 
 //   const handleTaskEdit = (task: Task) => {
+//     console.log("Editing task:", task);
 //     setEditingTask(task);
 //     taskForm.setFieldsValue({
 //       issueDescription: task.issueDescription,
@@ -142,8 +154,9 @@
 //         actualCompleteDate: values.actualCompleteDate ? dayjs(values.actualCompleteDate).toISOString() : null,
 //         customer: values.customer ? Number(values.customer) : null,
 //         resolver: values.resolver ? Number(values.resolver) : null,
-//         comments: [], // Initialize as empty if not provided in the form
+//         comments: [],
 //       };
+//       console.log("Submitting task data:", taskData);
 
 //       if (editingTask) {
 //         updateTask({ 
@@ -153,16 +166,19 @@
 //         }, {
 //           onSuccess: () => {
 //             notification.success({
-//               message: "Task Updated",
-//               description: "The task has been updated successfully.",
+//               message: t("Task Updated"),
+//               description: t("Task status updated successfully"),
+//               type: "success",
 //             });
 //             setEditingTask(null);
+//             refetch(); // Refetch tasks after updating
 //           },
 //           onError: (error: HttpError) => {
-//             console.error("Error updating task:", error);
+//             console.error("Error updating task with ID:", editingTask.id, error);
 //             notification.error({
-//               message: "Update Failed",
-//               description: `Failed to update task: ${error.message || "Unknown error"}`,
+//               message: t("Update Failed"),
+//               description: t("Failed to update task", { message: error.message || t("Unknown") }),
+//               type: "error",
 //               duration: 0,
 //             });
 //           },
@@ -174,15 +190,18 @@
 //         }, {
 //           onSuccess: () => {
 //             notification.success({
-//               message: "Task Created",
-//               description: "The task has been created successfully.",
+//               message: t("Task Created"),
+//               description: t("Task created successfully"),
+//               type: "success",
 //             });
+//             refetch(); // Refetch tasks after creating
 //           },
 //           onError: (error: HttpError) => {
 //             console.error("Error creating task:", error);
 //             notification.error({
-//               message: "Creation Failed",
-//               description: `Failed to create task: ${error.message || "Unknown error"}`,
+//               message: t("Creation Failed"),
+//               description: t("Failed to create task", { message: error.message || t("Unknown") }),
+//               type: "error",
 //               duration: 0,
 //             });
 //           },
@@ -193,6 +212,37 @@
 //     });
 //   };
 
+//   const handleCommentSubmit = (taskId: number, commentContent: string) => {
+//     createComment({
+//       resource: "comments",
+//       values: {
+//         content: commentContent,
+//         task: taskId,
+//         author: user?.id, // Use the logged-in user's ID from useGetIdentity
+//       },
+//       successNotification: {
+//         message: t("Comment Added"),
+//         description: t("Comment added successfully"),
+//         type: "success",
+//       },
+//     }, {
+//       onSuccess: () => {
+//         refetch(); // Refetch tasks to update the UI with the new comment
+//       },
+//       onError: (error: HttpError) => {
+//         console.error("Error creating comment:", error);
+//         notification.error({
+//           message: t("Comment Creation Failed"),
+//           description: t("Failed to create comment", { message: error.message || t("Unknown") }),
+//           type: "error",
+//           duration: 0,
+//         });
+//       },
+//     });
+//   };
+
+//   console.log("Rendering TaskBoard with tasks:", tasks);
+
 //   return (
 //     <>
 //       <TaskBoard
@@ -201,6 +251,7 @@
 //         onTaskDelete={handleTaskDelete}
 //         onTaskEdit={handleTaskEdit}
 //         onAddTask={() => setTaskModalVisible(true)}
+//         onCommentSubmit={handleCommentSubmit} // Pass the comment handler to TaskBoard
 //       />
 //       <TaskModal
 //         visible={isTaskModalVisible || !!editingTask}
@@ -211,7 +262,8 @@
 //         onOk={handleTaskSubmit}
 //         form={taskForm}
 //         users={users}
-//         customer={user2s}
+//         customers={customers}
+//         editingTask={editingTask} // Pass the editing task for comments
 //       />
 //     </>
 //   );

@@ -21,11 +21,11 @@ const Kanban: React.FC = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [taskForm] = Form.useForm();
 
-  const { data: tasksData, error: tasksError } = useList<Task>({
+  const { data: tasksData, error: tasksError, refetch } = useList<Task>({
     resource: "task-managements",
     meta: { 
       pagination: { current: 1, pageSize: 25 }, 
-      populate: ["customer", "resolver", "comments"] 
+      populate: ["customer", "resolver", "comments.author", "comments.task"] // Populate author and task for comments
     },
   });
   const { data: usersData, error: usersError } = useList<User>({ resource: "users" });
@@ -34,6 +34,7 @@ const Kanban: React.FC = () => {
   const { mutate: updateTask } = useUpdate<Task, HttpError>();
   const { mutate: deleteTask } = useDelete<Task, HttpError>();
   const { mutate: createTask } = useCreate<Task, HttpError>();
+  const { mutate: createComment } = useCreate(); // For creating comments
 
   const tasks = tasksData?.data || [];
   const users = usersData?.data || [];
@@ -80,6 +81,7 @@ const Kanban: React.FC = () => {
         notification.success({
           message: t("Task Updated"),
           description: t("Task status updated successfully"),
+          type: "success",
         });
       },
       onError: (error: HttpError) => {
@@ -87,6 +89,7 @@ const Kanban: React.FC = () => {
         notification.error({
           message: t("Update Failed"),
           description: t("Failed to update task", { message: error.message || t("Unknown") }),
+          type: "error",
           duration: 0,
         });
       },
@@ -106,6 +109,7 @@ const Kanban: React.FC = () => {
             notification.success({
               message: t("Task Deleted"),
               description: t("Task deleted successfully"),
+              type: "success",
             });
           },
           onError: (error: HttpError) => {
@@ -113,6 +117,7 @@ const Kanban: React.FC = () => {
             notification.error({
               message: t("Deletion Failed"),
               description: t("Failed to delete task", { message: error.message || t("Unknown") }),
+              type: "error",
               duration: 0,
             });
           },
@@ -163,14 +168,17 @@ const Kanban: React.FC = () => {
             notification.success({
               message: t("Task Updated"),
               description: t("Task status updated successfully"),
+              type: "success",
             });
             setEditingTask(null);
+            refetch(); // Refetch tasks after updating
           },
           onError: (error: HttpError) => {
             console.error("Error updating task with ID:", editingTask.id, error);
             notification.error({
               message: t("Update Failed"),
               description: t("Failed to update task", { message: error.message || t("Unknown") }),
+              type: "error",
               duration: 0,
             });
           },
@@ -184,13 +192,16 @@ const Kanban: React.FC = () => {
             notification.success({
               message: t("Task Created"),
               description: t("Task created successfully"),
+              type: "success",
             });
+            refetch(); // Refetch tasks after creating
           },
           onError: (error: HttpError) => {
             console.error("Error creating task:", error);
             notification.error({
               message: t("Creation Failed"),
               description: t("Failed to create task", { message: error.message || t("Unknown") }),
+              type: "error",
               duration: 0,
             });
           },
@@ -198,6 +209,35 @@ const Kanban: React.FC = () => {
       }
       setTaskModalVisible(false);
       taskForm.resetFields();
+    });
+  };
+
+  const handleCommentSubmit = (taskId: number, commentContent: string) => {
+    createComment({
+      resource: "comments",
+      values: {
+        content: commentContent,
+        task: taskId,
+        author: user?.id, // Use the logged-in user's ID from useGetIdentity
+      },
+      successNotification: {
+        message: t("Comment Added"),
+        description: t("Comment added successfully"),
+        type: "success",
+      },
+    }, {
+      onSuccess: () => {
+        refetch(); // Refetch tasks to update the UI with the new comment
+      },
+      onError: (error: HttpError) => {
+        console.error("Error creating comment:", error);
+        notification.error({
+          message: t("Comment Creation Failed"),
+          description: t("Failed to create comment", { message: error.message || t("Unknown") }),
+          type: "error",
+          duration: 0,
+        });
+      },
     });
   };
 
@@ -211,6 +251,7 @@ const Kanban: React.FC = () => {
         onTaskDelete={handleTaskDelete}
         onTaskEdit={handleTaskEdit}
         onAddTask={() => setTaskModalVisible(true)}
+        onCommentSubmit={handleCommentSubmit} // Pass the comment handler to TaskBoard
       />
       <TaskModal
         visible={isTaskModalVisible || !!editingTask}
@@ -222,6 +263,7 @@ const Kanban: React.FC = () => {
         form={taskForm}
         users={users}
         customers={customers}
+        editingTask={editingTask} // Pass the editing task for comments
       />
     </>
   );

@@ -10,12 +10,12 @@ interface TaskModalProps {
   form: any; // Or proper FormInstance type from Ant Design
   users: User[];
   customers: User2[];
+  editingTask?: Task | null; // Add editingTask as an optional prop
 }
 
-export const TaskModal: React.FC<TaskModalProps> = ({ visible, onCancel, onOk, form, users, customers }) => {
+export const TaskModal: React.FC<TaskModalProps> = ({ visible, onCancel, onOk, form, users, customers, editingTask }) => {
   const { t } = useTranslation();
 
-  // Define the status options with consistent values and translated labels
   const statusOptions = [
     { value: "To Do", label: t("To Do") },
     { value: "In Progress", label: t("In Progress") },
@@ -51,9 +51,9 @@ export const TaskModal: React.FC<TaskModalProps> = ({ visible, onCancel, onOk, f
         >
           <Select 
             options={[
-              { value: "Low", label: t("low") },
-              { value: "Medium", label: t("medium") },
-              { value: "High", label: t("high") },
+              { value: "Low", label: t("Low") },
+              { value: "Medium", label: t("Medium") },
+              { value: "High", label: t("High") },
             ]}
           />
         </Form.Item>
@@ -71,7 +71,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ visible, onCancel, onOk, f
           <DatePicker showTime format="YYYY-MM-DD" />
         </Form.Item>
         <Form.Item 
-          label={t("Target Completion Date")} 
+          label={t("Target Date")} 
           name="tobeCompletedDate"
         >
           <DatePicker showTime format="YYYY-MM-DD" />

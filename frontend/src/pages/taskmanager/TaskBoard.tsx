@@ -1,5 +1,12 @@
 import React from "react";
-import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided } from "@hello-pangea/dnd";
+import { 
+  DragDropContext, 
+  Droppable, 
+  Draggable, 
+  DropResult, 
+  DroppableProvided, 
+  DraggableProvided 
+} from "@hello-pangea/dnd";
 import { Card, Button, Tabs } from "antd";
 import { TaskCard } from "./TaskCard";
 import { Task } from "./types";
@@ -14,6 +21,7 @@ interface TaskBoardProps {
   onTaskDelete: (task: Task) => void;
   onTaskEdit: (task: Task) => void;
   onAddTask: () => void;
+  onCommentSubmit: (taskId: number, commentContent: string) => void; // New prop
 }
 
 export const TaskBoard: React.FC<TaskBoardProps> = ({
@@ -22,6 +30,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onTaskDelete,
   onTaskEdit,
   onAddTask,
+  onCommentSubmit,
 }) => {
   const { t } = useTranslation();
   const { token } = useToken();
@@ -48,7 +57,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                 {...provided.droppableProps}
                 style={{
                   width: 300,
-                  background: "white",
+                  background: "GREY",
                   padding: 12,
                   borderRadius: 4,
                   minHeight: 400,
@@ -76,6 +85,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             task={task}
                             onEdit={onTaskEdit}
                             onDelete={onTaskDelete}
+                            onCommentSubmit={onCommentSubmit} // Pass to TaskCard
                           />
                         </Card>
                       )}
